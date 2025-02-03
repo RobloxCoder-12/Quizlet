@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizlr - Features</title>
+    <!-- Add Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        padding: 2rem;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        align-items: center;
+        padding: 2rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: white;
+      }
+
+      h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2.5rem;
+        border-radius: 1.5rem;
+        width: 100%;
+        max-width: 800px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
+          0 1px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(139, 92, 246, 0.03)
+        );
+        pointer-events: none;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .feature-card h2 {
+        color: #8b5cf6;
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .feature-card i {
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .feature-card p {
+        color: #4b5563;
+        line-height: 1.8;
+        font-size: 1.1rem;
+      }
+
+      .home-button {
+        background: white;
+        color: #8b5cf6;
+        padding: 1.2rem 3rem;
+        border: none;
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .home-button:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        color: white;
+        background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 1rem;
+        }
+
+        h1 {
+          font-size: 2.5rem;
+        }
+
+        .feature-card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Powerful Features</h1>
+        <p class="subtitle">
+          Discover all the amazing features that make Quizlr the perfect
+          platform for creating and managing your quizzes.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2><i class="fas fa-user-lock"></i>User Login</h2>
+        <p>
+          Secure user authentication system with personalized dashboards for
+          each user. Save your quiz progress, access your quiz history, and
+          track your performance over time. Customize your profile and manage
+          your quiz preferences. Option to login with social media accounts or
+          email.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2><i class="fas fa-users-gear"></i>Collaborative Quiz Creation</h2>
+        <p>
+          Create and edit quizzes together with team members in real-time. Share
+          question banks and templates within your organization. Set different
+          access levels for viewers, editors, and administrators. Track all
+          changes with detailed revision history and restore previous versions
+          if needed.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2><i class="fas fa-circle-half-stroke"></i>Dark and Light Theme</h2>
+        <p>
+          Switch seamlessly between dark and light modes to suit your preference
+          and reduce eye strain. Automatically detect system preferences for
+          theme selection. Customize accent colors and contrast levels for
+          better accessibility. Consistent design across both themes for a
+          seamless experience.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2><i class="fas fa-certificate"></i>Certificate of Completion</h2>
+        <p>
+          Generate professional certificates upon successful quiz completion.
+          Customize certificate templates with your branding and quiz details.
+          Download certificates in multiple formats (PDF, PNG). Include unique
+          verification codes and QR codes for authenticity verification.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2><i class="fas fa-chart-line"></i>Real-time Analytics Dashboard</h2>
+        <p>
+          Monitor quiz performance with comprehensive analytics in real-time.
+          View detailed statistics including completion rates, average scores,
+          and time spent. Generate visual reports with charts and graphs for
+          better insights. Export analytics data in various formats for further
+          analysis.
+        </p>
+      </div>
+
+      <a href="home.html" class="home-button">Back to Home</a>
+    </div>
+  </body>
+</html>

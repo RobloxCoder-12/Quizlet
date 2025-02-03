@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizller - Quiz Results</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap");
+
+      body {
+        font-family: "Lato", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .certificate-font {
+        font-family: "Playfair Display", serif;
+      }
+
+      .certificate-border {
+        background: linear-gradient(45deg, #ffd700, #f6e05e, #ffd700);
+        padding: 4px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .certificate-inner {
+        background: #fff;
+        background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f0f0f0' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+
+      .gold-text {
+        color: #b7791f;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-card {
+        transition: all 0.3s ease;
+      }
+
+      .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .animated-gradient {
+        background: linear-gradient(270deg, #667eea, #764ba2, #6b46c1);
+        background-size: 600% 600%;
+        animation: gradientShift 15s ease infinite;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen p-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-2xl p-8">
+      <div
+        id="certificate"
+        class="certificate-border rounded-lg overflow-hidden mb-12"
+      >
+        <div class="certificate-inner p-10 text-center">
+          <h1 class="text-5xl font-bold mb-8 certificate-font gold-text">
+            Certificate of Completion
+          </h1>
+          <p class="text-2xl mb-4">This is to certify that</p>
+          <h2
+            id="userName"
+            class="text-4xl font-bold mb-6 certificate-font"
+          ></h2>
+          <p class="text-xl mb-4">
+            Registration Number:
+            <span id="userRegNo" class="font-semibold"></span>
+          </p>
+          <p class="text-2xl mb-8">
+            has successfully completed the Quizller quiz
+          </p>
+          <h3
+            id="userScore"
+            class="text-3xl font-bold mb-8 certificate-font gold-text"
+          ></h3>
+          <p class="text-lg mb-2">
+            Date: <span id="quizDate" class="font-semibold"></span>
+          </p>
+          <p class="text-lg">
+            Email: <span id="userEmail" class="font-semibold"></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center mb-12 flex justify-center space-x-4">
+        <button
+          id="downloadBtn"
+          class="animated-gradient text-white font-bold py-3 px-6 rounded-full text-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+        >
+          Download Certificate
+        </button>
+        <button
+          id="reattemptBtn"
+          class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full text-lg transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Reattempt Quiz
+        </button>
+      </div>
+
+      <h2 class="text-4xl font-bold mb-8 text-center text-gray-800">
+        Detailed Results
+      </h2>
+      <div id="resultsContainer" class="space-y-6"></div>
+    </div>
+
+    <script>
+      const quizData = JSON.parse(localStorage.getItem("quizQuestions")) || [];
+      const userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+      let score = 0;
+
+      function displayResults() {
+        const resultsContainer = document.getElementById("resultsContainer");
+
+        quizData.forEach((question, index) => {
+          const userAnswer = userAnswers[index];
+          const isCorrect = userAnswer === question.correctAnswer;
+          if (isCorrect) score++;
+
+          const questionDiv = document.createElement("div");
+          questionDiv.classList.add(
+            "result-card",
+            "p-6",
+            "border",
+            "rounded-lg",
+            "shadow-md",
+            isCorrect ? "bg-green-50" : "bg-red-50"
+          );
+          questionDiv.innerHTML = `
+            <p class="font-semibold text-lg mb-3">${index + 1}. ${
+            question.question
+          }</p>
+            <p class="mb-2">Your answer: <span class="${
+              isCorrect ? "text-green-600 font-semibold" : "text-red-600"
+            }">${question.options[userAnswer]}</span></p>
+            <p>Correct answer: <span class="text-green-600 font-semibold">${
+              question.options[question.correctAnswer]
+            }</span></p>
+          `;
+          resultsContainer.appendChild(questionDiv);
+        });
+
+        // Update certificate
+        document.getElementById("userName").textContent =
+          userInfo.name || "N/A";
+        document.getElementById("userRegNo").textContent =
+          userInfo.regNo || "N/A";
+        document.getElementById("userEmail").textContent =
+          userInfo.email || "N/A";
+        document.getElementById(
+          "userScore"
+        ).textContent = `Score: ${score}/${quizData.length}`;
+        document.getElementById("quizDate").textContent =
+          new Date().toLocaleDateString();
+      }
+
+      function downloadCertificate() {
+        const certificate = document.getElementById("certificate");
+        html2canvas(certificate).then((canvas) => {
+          const link = document.createElement("a");
+          link.download = "quiz_certificate.png";
+          link.href = canvas.toDataURL();
+          link.click();
+        });
+      }
+
+      function reattemptQuiz() {
+        // Redirect to the quiz page
+        window.location.href = "quiz-page.html"; // Replace 'quiz.html' with the actual URL of your quiz page
+      }
+
+      displayResults();
+
+      document
+        .getElementById("downloadBtn")
+        .addEventListener("click", downloadCertificate);
+      document
+        .getElementById("reattemptBtn")
+        .addEventListener("click", reattemptQuiz);
+    </script>
+  </body>
+</html>

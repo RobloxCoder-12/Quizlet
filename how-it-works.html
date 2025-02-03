@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How an Online Quiz App Works</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Styles */
+body {
+    background: linear-gradient(to right, #8A2BE2, #FF474C); /* Blue-violet to coral red gradient from left to right */
+    color: #F5F5F5; /* Dirty white text */
+    font-family: 'Arial Rounded MT Bold', sans-serif; /* Changed to Arial Rounded MT */
+    font-weight: bold; /* Keep text bold */
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    padding: 50px;
+    margin-left: 5%; /* Adjust the text to appear a little more left */
+}
+
+/* Header */
+h1 {
+    font-size: 48px; /* Increased font size for the title */
+    margin-bottom: 30px;
+    text-align: center;
+    color: #F5F5F5; /* Dirty white text */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Section Styles */
+.section {
+    background-color: rgba(245, 245, 245, 0.3); /* Matching opacity for the dirty white background */
+    color: #F5F5F5; /* Dirty white text */
+    padding: 30px; /* Increased padding for section */
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Adds a soft shadow to each section */
+    transition: transform 0.3s ease; /* Smooth transition for zoom effect */
+}
+
+/* Zoom in effect for the entire section */
+.section:hover {
+    transform: scale(1.05); /* Zoom in effect on hover */
+}
+
+/* Section Titles */
+h2 {
+    font-size: 32px; /* Increased font size for section titles */
+    margin-bottom: 10px;
+    color: #F5F5F5; /* Dirty white text for section titles */
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Paragraphs */
+p {
+    font-size: 20px; /* Increased font size for content */
+    line-height: 1.8; /* Increased line height for better readability */
+    margin-bottom: 30px;
+    padding: 10px;
+    color: #F5F5F5; /* Dirty white text for content paragraphs */
+    border-radius: 8px;
+}
+
+/* Home Button */
+.home-button {
+    display: block;
+    margin: 30px auto;
+    padding: 20px 40px; /* Increased size of the button */
+    background-color: #800080; /* Purple background */
+    color: #fff; /* White text */
+    border: none;
+    cursor: pointer;
+    font-size: 20px; /* Increased font size for the button */
+    border-radius: 8px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for aesthetics */
+}
+
+/* Animation for Home Button */
+.home-button:hover {
+    background-color: #ff00ff; /* Lighter purple on hover */
+    transform: scale(1.2); /* Larger zoom-in effect on hover */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title"></h1>
+        <div id="content"></div>
+
+        <button class="home-button" onclick="returnToHome()">Return to Home</button>
+    </div>
+
+    <script>
+        // JSON object to store expanded page content
+        const quizAppContent = {
+            "title": "How an Online Quiz App Works",
+            "sections": [
+                {
+                    "title": "Registration",
+                    "description": "Before accessing the quiz platform, users are required to register. This involves providing basic details such as name, email address, and creating a password. Some platforms also offer the option to sign in with social media accounts like Google or Facebook. After registration, users must verify their account via email."
+                },
+                {
+                    "title": "Creation of Quiz",
+                    "description": "The platform allows users to create custom quizzes on various topics. Users can choose the number of questions, type of questions (multiple choice, true/false, short answer), and assign a specific time limit for each quiz. Admins have access to additional settings like question randomization, difficulty levels, and answer explanations."
+                },
+                {
+                    "title": "Choosing a Quiz",
+                    "description": "Users are presented with a list of available quizzes categorized by topic or difficulty level. They can search or filter based on subject areas like math, science, or general knowledge. Each quiz shows the number of questions, time limit, and difficulty level, allowing users to choose based on their interests."
+                },
+                {
+                    "title": "Starting a Quiz",
+                    "description": "After selecting a quiz, users start the quiz by clicking the 'Start' button. A countdown timer begins, and the first question is displayed. Questions are shown one at a time, with users selecting their answers from multiple choices or inputting their responses."
+                },
+                {
+                    "title": "Submitting the Quiz",
+                    "description": "Once all the questions are answered, or the time runs out, users can submit the quiz for evaluation. Some platforms allow users to review their answers before final submission, while others submit automatically after the time expires."
+                },
+                {
+                    "title": "Evaluation of Quiz",
+                    "description": "The platform automatically evaluates the answers based on predefined correct answers. For multiple-choice or true/false questions, grading is instant. For subjective or short-answer questions, human evaluation might be needed, depending on the platform's capabilities."
+                },
+                {
+                    "title": "Displaying Results",
+                    "description": "After evaluation, the platform provides immediate feedback, displaying the user's score. Detailed explanations for correct and incorrect answers are shown, and users can review their mistakes. Some platforms provide insights into the user's strengths and weaknesses."
+                },
+                {
+                    "title": "Leaderboard and Rewards",
+                    "description": "Many quiz apps feature leaderboards that show top performers in various categories. Some platforms also offer rewards like badges, certificates, or discounts based on performance, motivating users to improve their scores."
+                },
+                {
+                    "title": "Tracking Progress",
+                    "description": "Users can track their progress over time by viewing their quiz history. This feature allows them to see past scores, quiz attempts, and performance trends. It helps users identify areas for improvement."
+                }
+            ]
+        };
+
+        // Dynamically populate the content using JSON
+        document.getElementById('title').innerText = quizAppContent.title.toUpperCase();
+
+        let contentContainer = document.getElementById('content');
+        quizAppContent.sections.forEach(section => {
+            let sectionElement = document.createElement('div');
+            sectionElement.classList.add('section');
+            
+            let sectionTitle = document.createElement('h2');
+            sectionTitle.innerText = section.title.toUpperCase(); // Convert title to uppercase
+            sectionElement.appendChild(sectionTitle);
+            
+            let sectionDescription = document.createElement('p');
+            sectionDescription.innerText = section.description;
+            sectionElement.appendChild(sectionDescription);
+
+            contentContainer.appendChild(sectionElement);
+        });
+
+        // Redirect function
+        function returnToHome() {
+            const homeRedirectInfo = {
+                "redirectTo": "home.html",
+                "message": "Returning to the homepage"
+            };
+            alert(homeRedirectInfo.message);
+            window.location.href = homeRedirectInfo.redirectTo;
+        }
+    </script>
+</body>
+</html>

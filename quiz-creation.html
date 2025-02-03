@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizller - Quiz Creation</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes slideDown {
+        from {
+          transform: translateY(-20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .animate-slideDown {
+        animation: slideDown 0.5s ease-out;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      .animate-pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .gradient-bg {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+      }
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .right-menu {
+        width: 20%;
+        height: 100%;
+        position: fixed;
+        right: -20%;
+        top: 0;
+        background-color: #ffffff;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+      }
+      .right-menu.open {
+        right: 0;
+      }
+      .menu-toggle {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        z-index: 1000;
+        background-color: #ffffff;
+        border-radius: 50%;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .attempt-btn {
+        background-color: #4caf50; /* Green */
+        border: none;
+
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .attempt-btn:hover {
+        background-color: #45a049; /* Darker green on hover */
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 min-h-screen p-8"
+  >
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16m-7 6h7"
+        />
+      </svg>
+    </button>
+
+    <div class="right-menu" id="rightMenu">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-purple-600">
+          Additional Options
+        </h2>
+        <select id="classSelect" class="w-full p-2 mb-4 border rounded">
+          <option value="">Select Class</option>
+          <option value="1">Class 1</option>
+          <option value="2">Class 2</option>
+          <option value="3">Class 3</option>
+          <option value="4">Class 4</option>
+          <option value="5">Class 5</option>
+          <option value="6">Class 6</option>
+          <option value="7">Class 7</option>
+          <option value="8">Class 8</option>
+          <option value="9">Class 9</option>
+          <option value="10">Class 10</option>
+          <option value="11">Class 11</option>
+          <option value="12">Class 12</option>
+          <option value="other">Other than school</option>
+        </select>
+        <input
+          type="text"
+          id="subjectInput"
+          placeholder="Subject"
+          class="w-full p-2 mb-4 border rounded"
+        />
+      </div>
+    </div>
+
+    <div class="container mx-auto">
+      <h1
+        class="text-4xl font-bold text-white text-center mb-8 animate-slideDown animate-float"
+      >
+        QUIZ CREATION
+      </h1>
+
+      <div
+        id="selectedClassInfo"
+        class="text-white text-2xl font-semibold mb-6 text-center animate-slideDown hidden"
+      ></div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-purple-600">
+          User Information
+        </h2>
+        <input
+          type="text"
+          id="userName"
+          placeholder="Full Name"
+          class="w-full p-2 mb-4 border rounded"
+        />
+        <input
+          type="text"
+          id="userRegNo"
+          placeholder="Registration Number"
+          class="w-full p-2 mb-4 border rounded"
+        />
+        <input
+          type="email"
+          id="userEmail"
+          placeholder="Email ID"
+          class="w-full p-2 mb-4 border rounded"
+        />
+      </div>
+
+      <div
+        id="selectedSubjectInfo"
+        class="text-white text-xl font-semibold mb-6 text-center animate-slideDown hidden"
+      ></div>
+
+      <div id="questionContainer" class="space-y-6"></div>
+      <button
+        id="addQuestion"
+        class="mt-6 bg-white text-purple-600 font-bold py-2 px-4 rounded hover:bg-purple-100 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg animate-pulse"
+      >
+        Add Question
+      </button>
+      <button
+        id="startQuiz"
+        class="mt-6 ml-4 bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg animate-pulse"
+      >
+        Start Quiz
+      </button>
+      <button
+        class="mt-6 ml-4 bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg animate-pulse"
+        onclick="redirectToQuiz()"
+      >
+        Attempt Quiz
+      </button>
+
+      <div class="mt-12 flex justify-between space-x-1 items-center">
+        <div
+          class="bg-white p-6 rounded-lg shadow-md w-70 h-70 flex flex-col justify-center items-center text-center"
+        >
+          <h3 class="text-lg font-semibold mb-2">Easy to Use</h3>
+          <p>Create quizzes quickly with our intuitive interface.</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-lg shadow-md w-70 h-70 flex flex-col justify-center items-center text-center"
+        >
+          <h3 class="text-lg font-semibold mb-2">Customizable</h3>
+          <p>Tailor quizzes to your specific needs and preferences.</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-lg shadow-md w-75 h-70 flex flex-col justify-center items-center text-center"
+        >
+          <h3 class="text-lg font-semibold mb-2">Instant Results</h3>
+          <p>Get immediate feedback on quiz performance.</p>
+        </div>
+        <div
+          class="bg-white p-6 rounded-lg shadow-md w-70 h-70 flex flex-col justify-center items-center text-center"
+        >
+          <h3 class="text-lg font-semibold mb-2">Progress Tracking</h3>
+          <p>Monitor learning progress over time with detailed analytics.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="confetti" class="fixed inset-0 pointer-events-none"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+      let questionCount = 0;
+      let quizQuestions = [];
+
+      function addQuestion() {
+        questionCount++;
+        const questionDiv = document.createElement("div");
+        questionDiv.classList.add(
+          "bg-white",
+          "p-6",
+          "rounded-lg",
+          "shadow-md",
+          "animate-slideDown",
+          "gradient-bg"
+        );
+        questionDiv.innerHTML = `
+          <h2 class="text-xl font-semibold mb-4 text-white">Question ${questionCount}</h2>
+          <input type="text" placeholder="Enter question" class="w-full p-2 mb-4 border rounded question-text">
+          <div class="space-y-2">
+            <input type="text" placeholder="Option 1" class="w-full p-2 border rounded option">
+            <input type="text" placeholder="Option 2" class="w-full p-2 border rounded option">
+            <input type="text" placeholder="Option 3" class="w-full p-2 border rounded option">
+            <input type="text" placeholder="Option 4" class="w-full p-2 border rounded option">
+          </div>
+          <select class="w-full p-2 mt-4 border rounded correct-answer">
+            <option value="">Select correct answer</option>
+            <option value="0">Option 1</option>
+            <option value="1">Option 2</option>
+            <option value="2">Option 3</option>
+            <option value="3">Option 4</option>
+          </select>
+        `;
+        document.getElementById("questionContainer").appendChild(questionDiv);
+
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      }
+
+      document
+        .getElementById("addQuestion")
+        .addEventListener("click", addQuestion);
+      document.getElementById("startQuiz").addEventListener("click", () => {
+        const userInfo = {
+          name: document.getElementById("userName").value,
+          regNo: document.getElementById("userRegNo").value,
+          email: document.getElementById("userEmail").value,
+          class: document.getElementById("classSelect").value,
+          subject: document.getElementById("subjectInput").value,
+        };
+
+        const questions = document.querySelectorAll("#questionContainer > div");
+        quizQuestions = Array.from(questions).map((q) => ({
+          question: q.querySelector(".question-text").value,
+          options: Array.from(q.querySelectorAll(".option")).map(
+            (o) => o.value
+          ),
+          correctAnswer: parseInt(q.querySelector(".correct-answer").value),
+        }));
+
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        localStorage.setItem("quizQuestions", JSON.stringify(quizQuestions));
+
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = {
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          zIndex: 0,
+        };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        const interval = setInterval(function () {
+          const timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
+            return clearInterval(interval);
+          }
+
+          const particleCount = 50 * (timeLeft / duration);
+          confetti(
+            Object.assign({}, defaults, {
+              particleCount,
+              origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            })
+          );
+          confetti(
+            Object.assign({}, defaults, {
+              particleCount,
+              origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            })
+          );
+        }, 250);
+
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, duration);
+      });
+
+      function toggleMenu() {
+        const menu = document.getElementById("rightMenu");
+        menu.classList.toggle("open");
+      }
+
+      function updateClassInfo() {
+        const classSelect = document.getElementById("classSelect");
+        const selectedClassInfo = document.getElementById("selectedClassInfo");
+
+        const selectedClass = classSelect.value;
+
+        if (selectedClass) {
+          const classText =
+            selectedClass === "other" ? "Other" : `Class ${selectedClass}`;
+          selectedClassInfo.textContent = classText;
+          selectedClassInfo.classList.remove("hidden");
+        } else {
+          selectedClassInfo.classList.add("hidden");
+        }
+      }
+
+      function updateSubjectInfo() {
+        const subjectInput = document.getElementById("subjectInput");
+        const selectedSubjectInfo = document.getElementById(
+          "selectedSubjectInfo"
+        );
+
+        const subject = subjectInput.value;
+
+        if (subject) {
+          selectedSubjectInfo.textContent = `Subject: ${subject}`;
+          selectedSubjectInfo.classList.remove("hidden");
+        } else {
+          selectedSubjectInfo.classList.add("hidden");
+        }
+      }
+
+      document
+        .getElementById("classSelect")
+        .addEventListener("change", updateClassInfo);
+      document
+        .getElementById("subjectInput")
+        .addEventListener("input", updateSubjectInfo);
+
+      addQuestion();
+
+      function redirectToQuiz() {
+        window.location.href = "quiz-page.html"; // Redirects to quiz-page.html
+      }
+    </script>
+  </body>
+</html>

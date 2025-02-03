@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizller - Take Quiz</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      .animate-pulse {
+        animation: pulse 2s infinite;
+      }
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        font-family: Arial, sans-serif;
+      }
+      .dark-mode {
+        background-color: #1e1e1e;
+        color: #ffffff;
+      }
+
+      /* Styling for redirect button */
+      .redirect-button {
+        background-color: #4caf50; /* Green background */
+        color: white; /* White text */
+        font-weight: bold;
+        padding: 12px 24px;
+        font-size: 18px;
+        text-align: center;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+      .redirect-button:hover {
+        background-color: #45a049; /* Darker green on hover */
+        transform: scale(1.05); /* Slight zoom effect */
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 min-h-screen p-8"
+  >
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-xl p-8">
+      <h1 class="text-3xl font-bold text-center mb-6">Quiz in Progress</h1>
+
+      <!-- Subject Dropdown -->
+      <div class="mb-6">
+        <label for="subject" class="block text-lg font-semibold"
+          >Select Subject:</label
+        >
+        <select id="subject" class="w-full p-2 border rounded">
+          <option value="maths">Maths</option>
+          <option value="physics">Physics</option>
+          <option value="chemistry">Chemistry</option>
+        </select>
+      </div>
+
+      <div id="timer" class="text-2xl font-bold text-center mb-6 animate-pulse">
+        20
+      </div>
+
+      <div id="questionContainer" class="mb-6">
+        <h2 id="questionText" class="text-xl font-semibold mb-4"></h2>
+        <div id="optionsContainer" class="space-y-2"></div>
+      </div>
+
+      <div class="flex justify-between">
+        <button
+          id="prevQuestion"
+          class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Previous
+        </button>
+        <button
+          id="nextQuestion"
+          class="bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        >
+          Next
+        </button>
+      </div>
+
+      <button
+        id="submitQuiz"
+        class="mt-6 w-full bg-green-500 text-white font-bold py-2 px-4 rounded"
+      >
+        Submit Quiz
+      </button>
+
+      <!-- Redirect Button -->
+      <div class="mt-8 text-center">
+        <button id="redirectButton" class="redirect-button">Home Page</button>
+      </div>
+    </div>
+
+    <script>
+      const quizQuestions = {
+        maths: [
+          {
+            question: "What is 10 + 5?",
+            options: ["10", "15", "20", "25"],
+            answer: 1,
+          },
+          {
+            question: "What is the square root of 49?",
+            options: ["6", "7", "8", "9"],
+            answer: 1,
+          },
+        ],
+        physics: [
+          {
+            question: "What is the speed of light?",
+            options: ["3x10^8 m/s", "3x10^5 m/s", "1x10^6 m/s", "5x10^8 m/s"],
+            answer: 0,
+          },
+          {
+            question: "Who formulated the laws of motion?",
+            options: ["Newton", "Einstein", "Tesla", "Galileo"],
+            answer: 0,
+          },
+        ],
+        chemistry: [
+          {
+            question: "What is H2O?",
+            options: ["Hydrogen", "Oxygen", "Water", "Carbon Dioxide"],
+            answer: 2,
+          },
+          {
+            question: "What is the atomic number of Carbon?",
+            options: ["6", "8", "12", "14"],
+            answer: 0,
+          },
+        ],
+      };
+
+      let currentSubject = "maths";
+      let currentQuestionIndex = 0;
+      let quizData = quizQuestions[currentSubject];
+      let userAnswers = [];
+      let timerValue = 20;
+      let timerInterval;
+
+      // Start the timer
+      function startTimer() {
+        timerInterval = setInterval(() => {
+          if (timerValue > 0) {
+            timerValue--;
+            document.getElementById("timer").textContent = timerValue;
+          } else {
+            clearInterval(timerInterval);
+            alert("Time's up! Submitting the quiz...");
+            showResults();
+          }
+        }, 1000);
+      }
+
+      function loadQuestion() {
+        const question = quizData[currentQuestionIndex];
+        document.getElementById("questionText").textContent = question.question;
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.textContent = option;
+          button.classList.add(
+            "w-full",
+            "p-2",
+            "text-left",
+            "border",
+            "rounded",
+            "hover:bg-gray-100",
+            "transition",
+            "duration-300"
+          );
+          button.addEventListener("click", () => selectAnswer(index));
+          optionsContainer.appendChild(button);
+        });
+      }
+
+      function selectAnswer(selectedIndex) {
+        userAnswers[currentQuestionIndex] = selectedIndex;
+        nextQuestion();
+      }
+
+      function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+          loadQuestion();
+        } else {
+          alert("Quiz finished! Submitting answers...");
+          showResults();
+        }
+      }
+
+      function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+          currentQuestionIndex--;
+          loadQuestion();
+        }
+      }
+
+      // Show results and calculate score
+      function showResults() {
+        clearInterval(timerInterval); // Stop the timer when the quiz is submitted
+        let score = 0;
+        quizData.forEach((question, index) => {
+          if (userAnswers[index] === question.answer) {
+            score++;
+          }
+        });
+
+        const totalQuestions = quizData.length;
+        alert(`You scored ${score} out of ${totalQuestions}`);
+      }
+
+      document.getElementById("subject").addEventListener("change", (e) => {
+        currentSubject = e.target.value;
+        quizData = quizQuestions[currentSubject];
+        currentQuestionIndex = 0;
+        loadQuestion();
+      });
+
+      document
+        .getElementById("nextQuestion")
+        .addEventListener("click", nextQuestion);
+      document
+        .getElementById("prevQuestion")
+        .addEventListener("click", prevQuestion);
+      document
+        .getElementById("submitQuiz")
+        .addEventListener("click", showResults);
+
+      // Redirect button event listener
+      document
+        .getElementById("redirectButton")
+        .addEventListener("click", () => {
+          window.location.href = "home.html"; // Change this to the actual page you want to redirect to
+        });
+
+      loadQuestion();
+      startTimer(); // Start the timer when the quiz is loaded
+    </script>
+  </body>
+</html>

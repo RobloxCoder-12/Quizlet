@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizller - Take Quiz</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+      .animate-pulse {
+        animation: pulse 2s infinite;
+      }
+
+      /* Default light mode */
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        font-family: Arial, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      header {
+        background-color: #f0f0f0;
+        padding: 20px;
+        text-align: center;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      /* Dark mode styles */
+      .dark-mode {
+        background-color: #1e1e1e;
+        color: #ffffff;
+      }
+
+      .dark-mode header {
+        background-color: #333333;
+      }
+
+      .dark-mode button {
+        background-color: #444444;
+        color: #ffffff;
+      }
+
+      /* Timer default light mode */
+      #timer {
+        color: #000;
+      }
+
+      /* Timer dark mode */
+      .dark-mode #timer {
+        color: #000;
+      }
+
+      /* Question text light mode */
+      #questionText,
+      #optionsContainer {
+        color: #000;
+      }
+
+      /* Question text dark mode */
+      .dark-mode #questionText,
+      .dark-mode #optionsContainer {
+        color: #000;
+      }
+      .dark-mode h1 {
+        color: #000;
+      }
+
+      /* The switch container */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      /* Hide the default HTML checkbox */
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      /* The slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      /* When the checkbox is checked */
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      /* Move the slider when checked */
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      /* Rounded slider */
+      .slider.round {
+        border-radius: 34px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 min-h-screen p-8"
+  >
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-xl p-8">
+      <h1 class="text-3xl font-bold text-center mb-6">Quiz in Progress</h1>
+
+      <div id="timer" class="text-2xl font-bold text-center mb-6 animate-pulse">
+        20
+      </div>
+
+      <!-- Dark Mode Toggle (Slider) -->
+      <label class="switch">
+        <input type="checkbox" id="theme-toggle" />
+        <span class="slider round"></span>
+      </label>
+
+      <div id="questionContainer" class="mb-6">
+        <h2 id="questionText" class="text-xl font-semibold mb-4"></h2>
+        <div id="optionsContainer" class="space-y-2"></div>
+      </div>
+
+      <div class="flex justify-between">
+        <button
+          id="prevQuestion"
+          class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded hover:bg-gray-400 transition duration-300"
+        >
+          Previous
+        </button>
+        <button
+          id="nextQuestion"
+          class="bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
+        >
+          Next
+        </button>
+      </div>
+
+      <button
+        id="submitQuiz"
+        class="mt-6 w-full bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition duration-300"
+      >
+        Submit Quiz
+      </button>
+    </div>
+
+    <script>
+      let quizData = JSON.parse(localStorage.getItem("quizQuestions")) || [];
+      let currentQuestion = 0;
+      let timer;
+      let score = 0;
+      let userAnswers = [];
+
+      // Function to shuffle array (Fisher-Yates algorithm)
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      // Randomize questions when the quiz is opened
+      function randomizeQuestions() {
+        quizData = shuffleArray(quizData);
+        localStorage.setItem("quizQuestions", JSON.stringify(quizData));
+      }
+
+      function loadQuestion() {
+        const question = quizData[currentQuestion];
+        document.getElementById("questionText").textContent = question.question;
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.textContent = option;
+          button.classList.add(
+            "w-full",
+            "p-2",
+            "text-left",
+            "border",
+            "rounded",
+            "hover:bg-gray-100",
+            "transition",
+            "duration-300"
+          );
+          button.addEventListener("click", () => selectAnswer(index));
+          optionsContainer.appendChild(button);
+        });
+        startTimer();
+      }
+
+      function startTimer() {
+        clearInterval(timer);
+        let time = 20;
+        document.getElementById("timer").textContent = time;
+        timer = setInterval(() => {
+          time--;
+          document.getElementById("timer").textContent = time;
+          if (time <= 0) {
+            clearInterval(timer);
+            nextQuestion();
+          }
+        }, 1000);
+      }
+
+      // Get the theme toggle checkbox
+      const toggleSwitch = document.getElementById("theme-toggle");
+
+      // Check if the user has a preferred theme stored in localStorage
+      const currentTheme = localStorage.getItem("theme");
+
+      // If the stored theme is 'dark', apply the dark mode class and set the checkbox to checked
+      if (currentTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        toggleSwitch.checked = true; // Set the checkbox as checked if dark mode is active
+      }
+
+      // Add event listener to toggle between dark and light modes
+      toggleSwitch.addEventListener("change", function () {
+        document.body.classList.toggle("dark-mode");
+
+        // Save the user's preference in localStorage
+        if (document.body.classList.contains("dark-mode")) {
+          localStorage.setItem("theme", "dark");
+        } else {
+          localStorage.setItem("theme", "light");
+        }
+      });
+
+      function selectAnswer(selectedIndex) {
+        clearInterval(timer);
+        userAnswers[currentQuestion] = selectedIndex;
+        nextQuestion();
+      }
+
+      function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          loadQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function prevQuestion() {
+        if (currentQuestion > 0) {
+          currentQuestion--;
+          loadQuestion();
+        }
+      }
+
+      function showResults() {
+        localStorage.setItem("userAnswers", JSON.stringify(userAnswers));
+        window.location.href = "results-page.html";
+      }
+
+      document
+        .getElementById("prevQuestion")
+        .addEventListener("click", prevQuestion);
+      document
+        .getElementById("nextQuestion")
+        .addEventListener("click", nextQuestion);
+      document
+        .getElementById("submitQuiz")
+        .addEventListener("click", showResults);
+
+      // Randomize questions and start the quiz
+      randomizeQuestions();
+      loadQuestion();
+    </script>
+  </body>
+</html>

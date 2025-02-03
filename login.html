@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz App Login</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <div class="light-bulb"></div>
+    <div class="outer-container">
+      <div class="container-above-login">
+        <img
+          class="images"
+          src="images/quizlr-high-resolution-logo.png"
+          alt=""
+        />
+      </div>
+      <div class="login-container">
+        <h2 class="text">Quizlr Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+      <p class="register">dont have an account?</p>
+      <p class="register">Click here to <a href="#">Register</a></p>
+      <p id="error-message" class="error-message"></p>
+      <a href="#" id="quiz-link" style="display: none">Go to Quiz</a>
+    </div>
+    <script src="login.js"></script>
+  </body>
+</html>
