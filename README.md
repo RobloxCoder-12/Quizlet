@@ -1,3 +1,3 @@
 # Quizlet
 
-This is a quiz managing app
+This is a quiz managing app...
