@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Mark Git Directory as Safe') {
+        stage('Prepare Environment') {
             steps {
                 script {
+                    // Ensure Git operations are not blocked due to ownership issues
                     bat 'git config --global --add safe.directory C:/nginx/html/Quizlet'
                 }
             }
@@ -16,6 +17,7 @@ pipeline {
                     bat '''
                     cd /d C:\\nginx\\html\\Quizlet
                     git reset --hard
+                    git clean -fd
                     git pull origin main
                     '''
                 }
