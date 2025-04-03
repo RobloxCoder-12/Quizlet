@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building the application...'
-                    sh 'echo Build successful!'  // Use sh for Linux compatibility
+                    bat 'echo Build successful!'  // Use bat for Windows compatibility
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    sh 'echo Tests executed successfully!'
+                    bat 'echo Tests executed successfully!'
                 }
             }
         }
@@ -38,14 +38,11 @@ pipeline {
                     
                     // Use sshagent for secure key handling
                     sshagent(['quizlet-key']) {  // Make sure 'quizlet-key' is the correct Jenkins credential ID
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
-                            cd /home/ec2-user
-                            git clone https://github.com/RobloxCoder-12/Quizlet.git quizlet-app || (cd quizlet-app && git pull)
-                            cd quizlet-app
-                            chmod +x deploy.sh
-                            ./deploy.sh
-                            EOF
+                        bat """
+                            echo Connecting to EC2...
+                            plink -ssh -batch -i C:\\path\\to\\private-key.ppk ${EC2_USER}@${EC2_HOST} ^
+                            "cd /home/ec2-user && git clone https://github.com/RobloxCoder-12/Quizlet.git quizlet-app || (cd quizlet-app && git pull) && ^
+                            cd quizlet-app && chmod +x deploy.sh && ./deploy.sh"
                         """
                     }
                 }
