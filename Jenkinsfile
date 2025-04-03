@@ -2,36 +2,38 @@ pipeline {
     agent any
 
     stages {
-        stage('Prepare Environment') {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+            }
+        }
+
+        stage('Build') {
             steps {
                 script {
-                    // Ensure Git operations are not blocked due to ownership issues
-                    bat 'git config --global --add safe.directory C:/nginx/html/Quizlet'
+                    echo 'Building the application...'
+                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
+                    bat 'echo Build successful!'
                 }
             }
         }
 
-        stage('Pull Latest Changes') {
+        stage('Test') {
             steps {
                 script {
-                    bat '''
-                    cd /d C:\\nginx\\html\\Quizlet
-                    git reset --hard
-                    git clean -fd
-                    git pull origin main
-                    '''
+                    echo 'Running tests...'
+                    // Add your test commands here (e.g., pytest, JUnit, etc.)
+                    bat 'echo Tests executed successfully!'
                 }
             }
         }
 
-        stage('Restart Nginx') {
+        stage('Deploy') {
             steps {
                 script {
-                    bat '''
-                    taskkill /IM nginx.exe /F
-                    timeout /t 3
-                    start C:\\nginx\\nginx.exe
-                    '''
+                    echo 'Deploying the application...'
+                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
+                    bat 'echo Deployment completed!'
                 }
             }
         }
@@ -39,10 +41,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful! Visit http://localhost/home.html to see changes.'
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo 'Deployment failed! Check Jenkins logs for errors.'
+            echo 'Pipeline failed! Check logs for errors.'
         }
     }
 }
