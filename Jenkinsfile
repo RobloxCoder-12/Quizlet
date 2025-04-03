@@ -4,7 +4,7 @@ pipeline {
     environment {
         EC2_USER = 'ec2-user'
         EC2_HOST = '52.90.251.226'  // Replace with your actual EC2 public IP
-        SSH_KEY = '/path/to/quizlet_key.pem'  // Replace with your actual key path in Jenkins
+        SSH_KEY = '"C:\Users\aadvi\Downloads\quizlet_key.pem"'  // Replace with your actual key path in Jenkins
     }
 
     stages {
