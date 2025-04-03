@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        EC2_USER = 'ec2-user'
+        EC2_HOST = '52.90.251.226'  // Replace with your actual EC2 public IP
+        SSH_KEY = '/path/to/quizlet_key.pem'  // Replace with your actual key path in Jenkins
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -12,8 +18,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building the application...'
-                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
-                    bat 'echo Build successful!'
+                    sh 'echo Build successful!'  // Changed 'bat' to 'sh' for Linux
                 }
             }
         }
@@ -22,18 +27,26 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    // Add your test commands here (e.g., pytest, JUnit, etc.)
-                    bat 'echo Tests executed successfully!'
+                    sh 'echo Tests executed successfully!'  // Changed 'bat' to 'sh'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to EC2') {
             steps {
                 script {
-                    echo 'Deploying the application...'
-                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
-                    bat 'echo Deployment completed!'
+                    echo 'Deploying the application to EC2...'
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
+                        cd /home/ec2-user &&
+                        sudo yum update -y &&
+                        git clone https://github.com/RobloxCoder-12/Quizlet.git quizlet-app ||
+                        (cd quizlet-app && git pull) &&
+                        cd quizlet-app &&
+                        chmod +x deploy.sh &&
+                        ./deploy.sh
+                        '
+                    """
                 }
             }
         }
@@ -41,7 +54,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline executed successfully!'
+            echo 'Pipeline executed successfully and deployed to EC2!'
         }
         failure {
             echo 'Pipeline failed! Check logs for errors.'
