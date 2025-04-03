@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         EC2_USER = 'ec2-user'
-        EC2_HOST = '52.90.251.226'  // Replace with your actual EC2 public IP
-        SSH_KEY = '"C:\Users\aadvi\Downloads\quizlet_key.pem"'  // Replace with your actual key path in Jenkins
+        EC2_HOST = '52.90.251.226'  // Replace with your EC2 public IP
     }
 
     stages {
@@ -18,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo 'Building the application...'
-                    sh 'echo Build successful!'  // Changed 'bat' to 'sh' for Linux
+                    sh 'echo Build successful!'  // Use sh for Linux compatibility
                 }
             }
         }
@@ -27,7 +26,7 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    sh 'echo Tests executed successfully!'  // Changed 'bat' to 'sh'
+                    sh 'echo Tests executed successfully!'
                 }
             }
         }
@@ -36,17 +35,19 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying the application to EC2...'
-                    sh """
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
-                        cd /home/ec2-user &&
-                        sudo yum update -y &&
-                        git clone https://github.com/RobloxCoder-12/Quizlet.git quizlet-app ||
-                        (cd quizlet-app && git pull) &&
-                        cd quizlet-app &&
-                        chmod +x deploy.sh &&
-                        ./deploy.sh
-                        '
-                    """
+                    
+                    // Use sshagent for secure key handling
+                    sshagent(['quizlet-key']) {  // Make sure 'quizlet-key' is the correct Jenkins credential ID
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
+                            cd /home/ec2-user
+                            git clone https://github.com/RobloxCoder-12/Quizlet.git quizlet-app || (cd quizlet-app && git pull)
+                            cd quizlet-app
+                            chmod +x deploy.sh
+                            ./deploy.sh
+                            EOF
+                        """
+                    }
                 }
             }
         }
