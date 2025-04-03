@@ -2,6 +2,14 @@ pipeline {
     agent any
 
     stages {
+        stage('Mark Git Directory as Safe') {
+            steps {
+                script {
+                    bat 'git config --global --add safe.directory C:/nginx/html/Quizlet'
+                }
+            }
+        }
+
         stage('Pull Latest Changes') {
             steps {
                 script {
