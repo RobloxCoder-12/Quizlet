@@ -47,4 +47,4 @@ Who Can Use Quizlett?
  Corporate Trainers – Conduct employee training sessions and assess knowledge retention.
  Trivia Enthusiasts – Play and challenge friends with fun quizzes.
 
-With Quizlett, learning becomes interactive, engaging, and effective. Whether for education, work, or fun, it’s your ultimate quiz companion! 🚀📚
+With Quizlett, learning becomes interactive, engaging, and effective. Whether for education, work, or fun, it’s your ultimate quiz companion! 
