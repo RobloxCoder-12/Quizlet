@@ -14,7 +14,7 @@ Timed & Adaptive Quizzes – Set time limits and difficulty adjustments based on
 
 Cloud Sync & Multi-Device Support – Access quizzes from anywhere, on any device.
 
-Quizlett is perfect for learning, teaching, and training in an interactive and engaging way. 🚀
+Quizlett is perfect for learning, teaching, and training in an interactive and engaging way. 
 
 
 Quizlett – {Smart Quiz Management Made Easy}
