@@ -23,13 +23,21 @@ Quizlett is an all-in-one quiz management app designed to simplify learning, tea
 Key Features:
  1- Create & Customize Quizzes – Design quizzes with multiple formats like multiple-choice, true/false, fill-in-the-blanks, and open-ended 
   questions.
+  
  2- AI-Powered Question Generation – Generate quiz questions instantly using AI assistance.
+ 
  3- Instant Scoring & Feedback – Get automatic grading and detailed explanations for answers.
+ 
  4- Performance Analytics – Track progress, review mistakes, and identify strengths and weaknesses.
+ 
  5- Collaboration & Sharing – Share quizzes with friends, students, or colleagues via links or QR codes.
+ 
  6- Timed & Adaptive Quizzes – Enable time limits and difficulty adjustments based on real-time performance.
+ 
  7- Gamification Elements – Earn badges, compete on leaderboards, and engage in quiz challenges.
+ 
  8- Offline Mode – Create and take quizzes even without an internet connection.
+ 
  9- Cloud Sync & Multi-Device Access – Access quizzes seamlessly across mobile, tablet, and desktop devices.
 
 Who Can Use Quizlett?
