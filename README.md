@@ -21,6 +21,7 @@ Quizlett – {Smart Quiz Management Made Easy}
 Quizlett is an all-in-one quiz management app designed to simplify learning, teaching, and training through interactive quizzes. Whether you’re a student preparing for exams, a teacher creating assessments, or a professional conducting training sessions, Quizlett provides an intuitive and feature-rich platform to enhance engagement and knowledge retention.
 
 Key Features:
+ 
  1- Create & Customize Quizzes – Design quizzes with multiple formats like multiple-choice, true/false, fill-in-the-blanks, and open-ended 
   questions.
   
