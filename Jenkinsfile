@@ -1,53 +1,62 @@
 pipeline {
     agent any
-
+    
     environment {
-        TF_IN_AUTOMATION = "true"
+        GIT_REPO = 'https://github.com/RobloxCoder-12/Quizlet'
+        BRANCH_NAME = 'main'
     }
-
+    
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Clone Repo') {
             steps {
-                // Clone the specific branch of the repository
-                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet'
+                script {
+                    echo "Cloning repository from ${GIT_REPO}..."
+                    bat "git clone ${GIT_REPO}"
+                }
             }
         }
-
-        stage('Debug') {
-            steps {
-                // Debugging output: Print the current branch and Terraform version
-                echo "Current branch: ${env.BRANCH_NAME}"
-                sh 'terraform --version'  // Use 'bat' for Windows agents
-            }
-        }
-
+        
         stage('Terraform Init') {
             steps {
-                dir('terraform') {
-                    // Run terraform init in the terraform directory
-                    sh 'terraform init'  // Use 'bat' for Windows agents
+                script {
+                    echo "Running Terraform Init..."
+                    bat 'terraform init'
                 }
             }
         }
-
+        
         stage('Terraform Plan') {
             steps {
-                dir('terraform') {
-                    // Run terraform plan in the terraform directory
-                    sh 'terraform plan'  // Use 'bat' for Windows agents
+                script {
+                    echo "Running Terraform Plan..."
+                    bat 'terraform plan'
                 }
             }
         }
-
+        
         stage('Terraform Apply') {
             steps {
-                // Ask for manual input before applying the changes
-                input "Apply the changes?"
-                dir('terraform') {
-                    // Run terraform apply in the terraform directory
-                    sh 'terraform apply -auto-approve'  // Use 'bat' for Windows agents
+                script {
+                    echo "Applying Terraform changes..."
+                    bat 'terraform apply -auto-approve'
                 }
             }
+        }
+    }
+    
+    post {
+        success {
+            echo "Pipeline successfully completed!"
+        }
+        failure {
+            echo "Pipeline failed!"
         }
     }
 }
+
