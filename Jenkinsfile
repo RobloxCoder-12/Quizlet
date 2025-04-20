@@ -3,12 +3,13 @@ pipeline {
 
     stages {
         stage('Terraform Init') {
-            steps {
-                dir('terraform') {
-                    bat 'terraform init'
-                }
-            }
+    steps {
+        dir('terraform') {
+            sh 'terraform init'
         }
+    }
+}
+
         stage('Terraform Validate') {
             steps {
                 dir('terraform') {
