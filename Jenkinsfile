@@ -89,3 +89,19 @@ environment {
     TF_DIR = '.'  // Or use the correct subfolder name if your .tf files are there
 }
 bat 'dir *.tf' // Shows if any .tf files are present before running init or plan
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+
+  required_version = ">= 1.3.0"
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
