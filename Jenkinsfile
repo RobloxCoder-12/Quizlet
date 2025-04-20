@@ -18,13 +18,18 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
-            steps {
-                dir('terraform') {
-                    bat 'terraform plan'
-                }
-            }
+       stage('Terraform Plan') {
+    steps {
+        dir('terraform') {
+            bat '''
+                echo --- Running Terraform Plan ---
+                terraform plan -no-color
+                echo --- Terraform Plan Completed ---
+            '''
         }
+    }
+}
+
 
         stage('Terraform Apply') {
             steps {
