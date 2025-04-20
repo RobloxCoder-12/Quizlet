@@ -23,22 +23,17 @@ pipeline {
             }
         }
 
-stage('Terraform Plan') {
-    steps {
-        dir("${TF_DIR}") {
-            script {
-                echo 'Planning infrastructure changes...'
-                try {
-                    bat 'terraform plan -out=tfplan'
-                } catch (err) {
-                    echo "Terraform Plan failed: ${err}"
-                    error("Stopping pipeline due to Terraform plan failure.")
+        stage('Terraform Plan') {
+            steps {
+                dir("${TF_DIR}") {
+                    script {
+                        echo 'Planning infrastructure changes...'
+                        // Running Terraform plan and capturing the output
+                        bat(script: 'terraform plan -out=tfplan', returnStatus: true) 
+                    }
                 }
             }
         }
-    }
-}
-
 
         stage('Terraform Apply') {
             steps {
