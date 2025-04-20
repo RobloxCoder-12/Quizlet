@@ -1,4 +1,4 @@
-pipeline {
+    pipeline {
     agent any
 
     environment {
@@ -23,20 +23,22 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
-            steps {
-                dir("${TF_DIR}") {
-                    script {
-                        echo 'Planning infrastructure changes...'
-                        // Running Terraform plan and capturing the output
-                        def planStatus = bat(script: 'terraform plan -out=tfplan', returnStatus: true)
-                        if (planStatus != 0) {
-                            error 'Terraform Plan failed. Exiting pipeline.'
-                        }
-                    }
+stage('Terraform Plan') {
+    steps {
+        dir("${TF_DIR}") {
+            script {
+                echo 'Planning infrastructure changes...'
+                def planOutput = bat(script: 'terraform plan -out=tfplan > plan_output.txt 2>&1', returnStatus: true)
+                bat 'type plan_output.txt' // show output in Jenkins log
+
+                if (planOutput != 0) {
+                    error 'Terraform Plan failed. See plan_output.txt for details.'
                 }
             }
         }
+    }
+}
+
 
         stage('Terraform Apply') {
             steps {
