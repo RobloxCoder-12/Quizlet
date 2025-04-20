@@ -1,50 +1,54 @@
 pipeline {
     agent any
 
+    environment {
+        TF_VAR_region = "us-east-1"
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+                git url: 'https://github.com/RobloxCoder-12/Quizlet.git', branch: 'main'
             }
         }
 
-        stage('Build') {
+        stage('Terraform Init') {
             steps {
-                script {
-                    echo 'Building the application...'
-                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
-                    bat 'echo Build successful!'
+                dir('terraform') { // change this if your .tf files are elsewhere
+                    sh 'terraform init'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Terraform Validate') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    // Add your test commands here (e.g., pytest, JUnit, etc.)
-                    bat 'echo Tests executed successfully!'
+                dir('terraform') {
+                    sh 'terraform validate'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Terraform Plan') {
             steps {
-                script {
-                    echo 'Deploying the application...'
-                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
-                    bat 'echo Deployment completed!'
+                dir('terraform') {
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                input message: 'Apply Terraform changes?', ok: 'Apply'
+                dir('terraform') {
+                    sh 'terraform apply tfplan'
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed! Check logs for errors.'
+        always {
+            echo 'Terraform Pipeline Finished.'
         }
     }
 }
