@@ -32,8 +32,10 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying the application...'
-                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
-                    bat 'echo Deployment completed!'
+                    // Assuming you build your project and the final output is in a "build" folder
+                    bat 'copy /Y build\\* C:\\nginx\\html\\'
+                    bat 'nginx -s reload'
+                    echo 'Deployment completed!'
                 }
             }
         }
