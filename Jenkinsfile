@@ -3,12 +3,12 @@ pipeline {
 
     stages {
         stage('Terraform Init') {
-    steps {
-        dir('terraform') {
-            sh 'terraform init'
+            steps {
+                dir('terraform') {
+                    bat 'terraform init'
+                }
+            }
         }
-    }
-}
 
         stage('Terraform Validate') {
             steps {
@@ -17,6 +17,7 @@ pipeline {
                 }
             }
         }
+
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
@@ -24,6 +25,7 @@ pipeline {
                 }
             }
         }
+
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
@@ -32,6 +34,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             echo 'Terraform Pipeline Finished.'
