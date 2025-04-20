@@ -1,51 +1,36 @@
 pipeline {
     agent any
 
-    environment {
-        TF_VAR_region = "us-east-1"
-    }
-
     stages {
-        stage('Clone Repo') {
-            steps {
-                git url: 'https://github.com/RobloxCoder-12/Quizlet.git', branch: 'main'
-            }
-        }
-
         stage('Terraform Init') {
             steps {
-                dir('terraform') { // change this if your .tf files are elsewhere
-                    sh 'terraform init'
+                dir('terraform') {
+                    bat 'terraform init'
                 }
             }
         }
-
         stage('Terraform Validate') {
             steps {
                 dir('terraform') {
-                    sh 'terraform validate'
+                    bat 'terraform validate'
                 }
             }
         }
-
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
-                    sh 'terraform plan -out=tfplan'
+                    bat 'terraform plan'
                 }
             }
         }
-
         stage('Terraform Apply') {
             steps {
-                input message: 'Apply Terraform changes?', ok: 'Apply'
                 dir('terraform') {
-                    sh 'terraform apply tfplan'
+                    bat 'terraform apply -auto-approve'
                 }
             }
         }
     }
-
     post {
         always {
             echo 'Terraform Pipeline Finished.'
