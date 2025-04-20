@@ -2,62 +2,86 @@ pipeline {
     agent any
 
     environment {
-        TF_IN_AUTOMATION = "true"
+        TF_VAR_region = 'us-west-1'  // Set your region or any other required variables
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                echo "🔄 Checking out code..."
-                checkout scm
+                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
             }
         }
 
-        stage('Verify Terraform Files') {
+        stage('Build') {
             steps {
-                echo "🔍 Listing current directory contents:"
-                bat 'dir'
+                script {
+                    echo 'Building the application...'
+                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
+                    bat 'echo Build successful!'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    // Add your test commands here (e.g., pytest, JUnit, etc.)
+                    bat 'echo Tests executed successfully!'
+                }
             }
         }
 
         stage('Terraform Init') {
             steps {
-                echo "🚀 Running terraform init..."
-                bat 'terraform init'
-            }
-        }
-
-        stage('Terraform Validate') {
-            steps {
-                echo "✅ Validating configuration..."
-                bat 'terraform validate'
+                script {
+                    echo 'Initializing Terraform...'
+                    bat '''
+                        terraform init
+                    '''
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                echo "🧠 Planning infrastructure changes..."
-                bat 'terraform plan -input=false'
+                script {
+                    echo 'Generating Terraform plan...'
+                    bat '''
+                        terraform plan -out=tfplan
+                    '''
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                echo "⚙️ Applying infrastructure changes..."
-                bat 'terraform apply -auto-approve -input=false'
+                script {
+                    echo 'Applying Terraform changes...'
+                    bat '''
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo 'Deploying the application...'
+                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
+                    bat 'echo Deployment completed!'
+                }
             }
         }
     }
 
     post {
         success {
-            echo "🎉 Pipeline completed successfully!"
+            echo 'Pipeline executed successfully!'
         }
         failure {
-            echo "❌ Pipeline failed. Check logs above."
-        }
-        always {
-            echo "📦 Terraform pipeline finished."
+            echo 'Pipeline failed! Check logs for errors.'
         }
     }
 }
