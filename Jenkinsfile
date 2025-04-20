@@ -85,3 +85,6 @@ pipeline {
         }
     }
 }
+environment {
+    TF_DIR = '.'  // Or use the correct subfolder name if your .tf files are there
+}
