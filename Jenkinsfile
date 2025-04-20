@@ -29,7 +29,10 @@ pipeline {
                     script {
                         echo 'Planning infrastructure changes...'
                         // Running Terraform plan and capturing the output
-                        bat(script: 'terraform plan -out=tfplan', returnStatus: true) 
+                        def planStatus = bat(script: 'terraform plan -out=tfplan', returnStatus: true)
+                        if (planStatus != 0) {
+                            error 'Terraform Plan failed. Exiting pipeline.'
+                        }
                     }
                 }
             }
