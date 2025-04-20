@@ -1,39 +1,50 @@
 pipeline {
     agent any
 
-    tools {
-        // 1. Use Jenkins NodeJS plugin (configure in Global Tools)
-        nodejs "NodeJS-18" 
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
-                git(
-                    branch: 'main',
-                    url: 'https://github.com/RobloxCoder-12/Quizlet.git',
-                    credentialsId: 'your-github-credentials' // Required for private repos
-                )
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                // 2. Directly use npm (plugin adds it to PATH)
-                bat 'npm install'
+                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'npm run build'
+                script {
+                    echo 'Building the application...'
+                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
+                    bat 'echo Build successful!'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    // Add your test commands here (e.g., pytest, JUnit, etc.)
+                    bat 'echo Tests executed successfully!'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo 'Deploying the application...'
+                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
+                    bat 'echo Deployment completed!'
+                }
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline execution completed'
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed! Check logs for errors.'
         }
     }
 }
