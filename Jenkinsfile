@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    environment {
-        // Optionally set NODE_ENV or other env variables
-        NODE_ENV = 'production'
+    // 1. Configure NodeJS tool (REQUIRED)
+    tools {
+        nodejs "NodeJS" // Name must match your Jenkins Global Tool Configuration
     }
 
     stages {
@@ -15,42 +15,31 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                // Install Node.js dependencies
-                bat 'npm install'
+                // 2. Use npm.cmd for Windows agents
+                bat 'npm.cmd install'
             }
         }
 
         stage('Build') {
             steps {
-                // Build the project (adjust command if your build script is different)
-                bat 'npm run build'
+                // 3. Actual build command (modify if your build script differs)
+                bat 'npm.cmd run build'
             }
         }
 
-        stage('Archive Build Artifacts') {
+        stage('Archive Artifacts') {
             steps {
-                // Archive the build/ directory so you can download it from Jenkins if needed
-                archiveArtifacts artifacts: 'build/**', allowEmptyArchive: false
+                archiveArtifacts artifacts: 'build/**/*', allowEmptyArchive: false
             }
         }
-
-        // Uncomment and configure this stage if you want to deploy
-        // stage('Deploy') {
-        //     steps {
-        //         // Replace 'your-ssh-credential-id' and 'user@yourserver:/var/www/html/' appropriately
-        //         sshagent(credentials: ['your-ssh-credential-id']) {
-        //             bat 'scp -r build/* user@yourserver:/var/www/html/'
-        //         }
-        //     }
-        // }
     }
 
     post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
         failure {
             echo 'Pipeline failed! Check logs for errors.'
+        }
+        success {
+            echo 'Pipeline executed successfully!'
         }
     }
 }
