@@ -1,45 +1,46 @@
 pipeline {
     agent any
 
-    // 1. Configure NodeJS tool (REQUIRED)
-    tools {
-        nodejs "NodeJS" // Name must match your Jenkins Global Tool Configuration
-    }
-
     stages {
+        // 1. Clone Repository with HTTPS and Credentials
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+                git(
+                    branch: 'main',
+                    url: 'https://github.com/RobloxCoder-12/Quizlet.git',
+                    credentialsId: 'your-github-credentials-id' // Add credentials ID here
+                )
             }
         }
 
+        // 2. Install NodeJS through NVM (No Plugin Required)
+        stage('Setup NodeJS') {
+            steps {
+                bat '''
+                    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+                    nvm install 18
+                    nvm use 18
+                '''
+            }
+        }
+
+        // 3. Build Stages
         stage('Install Dependencies') {
             steps {
-                // 2. Use npm.cmd for Windows agents
-                bat 'npm.cmd install'
+                bat 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                // 3. Actual build command (modify if your build script differs)
-                bat 'npm.cmd run build'
-            }
-        }
-
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: 'build/**/*', allowEmptyArchive: false
+                bat 'npm run build'
             }
         }
     }
 
     post {
-        failure {
-            echo 'Pipeline failed! Check logs for errors.'
-        }
-        success {
-            echo 'Pipeline executed successfully!'
+        always {
+            echo 'Pipeline execution completed'
         }
     }
 }
