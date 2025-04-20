@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        TF_VAR_region = 'us-west-1'  // Set your region or any other required variables
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -28,39 +24,6 @@ pipeline {
                     echo 'Running tests...'
                     // Add your test commands here (e.g., pytest, JUnit, etc.)
                     bat 'echo Tests executed successfully!'
-                }
-            }
-        }
-
-        stage('Terraform Init') {
-            steps {
-                script {
-                    echo 'Initializing Terraform...'
-                    bat '''
-                        terraform init
-                    '''
-                }
-            }
-        }
-
-        stage('Terraform Plan') {
-            steps {
-                script {
-                    echo 'Generating Terraform plan...'
-                    bat '''
-                        terraform plan -out=tfplan
-                    '''
-                }
-            }
-        }
-
-        stage('Terraform Apply') {
-            steps {
-                script {
-                    echo 'Applying Terraform changes...'
-                    bat '''
-                        terraform apply -auto-approve tfplan
-                    '''
                 }
             }
         }
