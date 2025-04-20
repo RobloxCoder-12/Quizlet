@@ -88,3 +88,4 @@ pipeline {
 environment {
     TF_DIR = '.'  // Or use the correct subfolder name if your .tf files are there
 }
+bat 'dir *.tf' // Shows if any .tf files are present before running init or plan
