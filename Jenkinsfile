@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image: ${DOCKER_IMAGE}"
-                    bat 'docker build -t ${DOCKER_IMAGE} .'
+                    bat "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     echo "Tagging Docker image as latest"
-                    bat 'docker tag ${DOCKER_IMAGE} ks2363/quizlet:latest'
+                    bat "docker tag ${DOCKER_IMAGE} ks2363/quizlet:latest"
                 }
             }
         }
@@ -46,8 +46,8 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to Docker Hub"
-                    bat 'docker push ${DOCKER_IMAGE}'
-                    bat 'docker push ks2363/quizlet:latest'
+                    bat "docker push ${DOCKER_IMAGE}"
+                    bat "docker push ks2363/quizlet:latest"
                 }
             }
         }
