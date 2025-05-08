@@ -1,75 +1,45 @@
 pipeline {
     agent any
-
     environment {
-        DOCKER_IMAGE_NAME = 'quizlet-app'
-        DOCKER_HUB_REPO = 'yourdockerhubusername/quizlet'
-        KUBERNETES_DEPLOYMENT_NAME = 'quizlet-deployment'
+        DOCKER_IMAGE = "ks2363/quizlet:latest"  // Your Docker Hub username and image name
     }
-
     stages {
-        stage('Checkout SCM') {
+        stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/RobloxCoder-12/Quizlet.git'  // Checkout from your Git repository
             }
         }
-
-        stage('Build App') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    bat 'echo Building the application...'
-                    bat 'npm install'
+                    // Build the Docker image
+                    docker.build("${DOCKER_IMAGE}")
                 }
             }
         }
-
-        stage('Build Docker Image') {
+        stage('Login to Docker Hub') {
             steps {
-                bat "docker build -t %DOCKER_HUB_REPO%:latest ."
+                // Authenticate to Docker Hub using your credentials stored in Jenkins
+                withCredentials([usernamePassword(credentialsId: '928122f6-ce90-49ac-a982-1ee44c55c50b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
+                }
             }
         }
-
-        stage('Push Image to Docker Hub') {
-            environment {
-                DOCKER_USER = credentials('docker-username') // use your Jenkins credentials ID
-                DOCKER_PASSWORD = credentials('docker-password')
-            }
+        stage('Push Docker Image') {
             steps {
-                bat 'echo Logging in to Docker Hub...'
-                bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASSWORD%'
-                bat "docker push %DOCKER_HUB_REPO%:latest"
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                bat "kubectl set image deployment/%KUBERNETES_DEPLOYMENT_NAME% %DOCKER_IMAGE_NAME%=%DOCKER_HUB_REPO%:latest"
-                bat "kubectl rollout status deployment/%KUBERNETES_DEPLOYMENT_NAME%"
-            }
-        }
-
-        stage('Test App') {
-            steps {
-                bat 'echo Testing the application...'
-                // Add test steps here
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                bat 'echo Cleanup step completed.'
-                // Add any needed cleanup commands
+                script {
+                    // Push the built image to Docker Hub
+                    docker.push("${DOCKER_IMAGE}")
+                }
             }
         }
     }
-
     post {
         always {
-            echo 'Pipeline execution completed.'
-        }
-        failure {
-            echo '❌ Deployment failed.'
+            echo 'Cleaning up...'
+            cleanWs()  // Clean up the workspace after the pipeline
         }
     }
 }
+
 
