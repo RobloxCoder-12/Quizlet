@@ -1,27 +1,26 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = "ks2363/quizlet:latest"  // Your Docker Hub username and image name
-        GIT_BRANCH = "main"  // Ensure this matches the branch in your Git repository
+        DOCKER_IMAGE = "ks2363/quizlet"
+        GIT_BRANCH = "main"
     }
     stages {
         stage('Checkout') {
             steps {
-                // Check out the correct branch
                 git branch: "${GIT_BRANCH}", url: 'https://github.com/RobloxCoder-12/Quizlet.git'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    docker.build("${DOCKER_IMAGE}")
+                    echo "Building Docker image: ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                    docker.tag("${DOCKER_IMAGE}:${env.BUILD_NUMBER}", "${DOCKER_IMAGE}:latest")
                 }
             }
         }
         stage('Login to Docker Hub') {
             steps {
-                // Authenticate to Docker Hub using your credentials stored in Jenkins
                 withCredentials([usernamePassword(credentialsId: '928122f6-ce90-49ac-a982-1ee44c55c50b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
                 }
@@ -30,16 +29,16 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the built image to Docker Hub
-                    docker.push("${DOCKER_IMAGE}")
+                    docker.push("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
+                    docker.push("${DOCKER_IMAGE}:latest")
                 }
             }
         }
     }
     post {
         always {
-            echo 'Cleaning up...'
-            cleanWs()  // Clean up the workspace after the pipeline
+            echo 'Cleaning up workspace...'
+            cleanWs()
         }
     }
 }
