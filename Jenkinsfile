@@ -2,49 +2,33 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+                git 'https://github.com/RobloxCoder-12/Quizlet.git'
             }
         }
 
-        stage('Build') {
+        stage('Build App') {
             steps {
-                script {
-                    echo 'Building the application...'
-                    // Add your build commands here (e.g., Maven, Gradle, npm, etc.)
-                    bat 'echo Build successful!'
-                }
+                echo 'Building Quizlet App...'
+                // For Node.js app:
+                sh 'npm install'
             }
         }
 
         stage('Test') {
             steps {
-                script {
-                    echo 'Running tests...'
-                    // Add your test commands here (e.g., pytest, JUnit, etc.)
-                    bat 'echo Tests executed successfully!'
-                }
+                echo 'Running tests...'
+                // Add your test commands here
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    echo 'Deploying the application...'
-                    // Add your deployment steps (e.g., Docker, Kubernetes, SCP, etc.)
-                    bat 'echo Deployment completed!'
-                }
+                echo 'Deploying to K8s cluster...'
+                sh 'kubectl apply -f k8s/deployment.yaml'
+                sh 'kubectl apply -f k8s/service.yaml'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed! Check logs for errors.'
         }
     }
 }
