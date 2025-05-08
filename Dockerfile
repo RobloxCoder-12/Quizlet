@@ -1,16 +1,20 @@
-# Use official Nginx image
-FROM nginx:alpine
+# Use an official Node.js runtime as a parent image
+FROM node:14
 
-# Remove default index.html if it exists
-RUN rm -rf /usr/share/nginx/html/*
+# Set the working directory inside the container
+WORKDIR /app
 
-# Copy your local home.html as index.html into the container
-COPY public/home.html /usr/share/nginx/html/index.html
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# Expose port 80
-EXPOSE 80
+# Copy the rest of the application code to the container
+COPY . .
 
+# Expose the port the app will run on
+EXPOSE 3000
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Command to run the app
+CMD ["npm", "start"]
+
 
