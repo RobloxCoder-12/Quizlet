@@ -19,7 +19,6 @@ pipeline {
                 script {
                     bat 'echo Building the application...'
                     bat 'npm install'
-                    bat 'npx webpack --config webpack.config.js'
                 }
             }
         }
