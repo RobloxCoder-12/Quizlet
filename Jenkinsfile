@@ -2,57 +2,35 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS_ID = '928122f6-ce90-49ac-a982-1ee44c55c50b'  // Reference to the credentials ID you added
+        DOCKER_IMAGE = 'quizlet-app:latest'
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
-                    echo "Building Docker image: ks2363/quizlet:17"
-                    bat 'docker build -t ks2363/quizlet:17 .'
+                    // Build the Docker image using bat for Windows
+                    bat 'docker build -t %DOCKER_IMAGE% .'
                 }
             }
         }
 
-        stage('Tag Docker Image') {
+        stage('Push') {
             steps {
                 script {
-                    echo "Tagging Docker image as latest"
-                    bat 'docker tag ks2363/quizlet:17 ks2363/quizlet:latest'
+                    // Push the Docker image to the registry using bat for Windows
+                    bat 'docker push %DOCKER_IMAGE%'
                 }
             }
         }
 
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        echo "Logging into Docker Hub"
-                        bat "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
-                    }
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
+        stage('Deploy') {
             steps {
                 script {
-                    echo "Pushing Docker image to Docker Hub"
-                    bat 'docker push ks2363/quizlet:latest'
+                    // Deploy the image (this could vary based on your deployment method)
+                    // Example for Kubernetes or other environments:
+                    bat 'kubectl set image deployment/quizlet-app quizlet-app=%DOCKER_IMAGE%'
                 }
-            }
-        }
-
-        stage('Post Actions') {
-            steps {
-                cleanWs()
             }
         }
     }
