@@ -1,49 +1,65 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_IMAGE = "ks2363/quizlet"
-        GIT_BRANCH = "main"
+        DOCKER_IMAGE = "ks2363/quizlet:17"
+        DOCKER_REGISTRY = "docker.io"
     }
+
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: "${GIT_BRANCH}", url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+                checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building Docker image: ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
-                    docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
-                    bat 'docker tag ks2363/quizlet:14 ks2363/quizlet:latest'
-
+                    echo "Building Docker image: ${DOCKER_IMAGE}"
+                    bat 'docker build -t ${DOCKER_IMAGE} .'
                 }
             }
         }
+
+        stage('Tag Docker Image') {
+            steps {
+                script {
+                    echo "Tagging Docker image as latest"
+                    bat 'docker tag ${DOCKER_IMAGE} ks2363/quizlet:latest'
+                }
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: '928122f6-ce90-49ac-a982-1ee44c55c50b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
-
+                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        echo "Logging into Docker Hub"
+                        bat "echo ${DOCKER_PASSWORD} | docker login -u ks2363 --password-stdin"
+                    }
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.push("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
-                    docker.push("${DOCKER_IMAGE}:latest")
+                    echo "Pushing Docker image to Docker Hub"
+                    bat 'docker push ${DOCKER_IMAGE}'
+                    bat 'docker push ks2363/quizlet:latest'
                 }
             }
         }
     }
+
     post {
         always {
-            echo 'Cleaning up workspace...'
             cleanWs()
         }
     }
 }
+
 
 
 
