@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'quizlet-app'
-        DOCKER_TAG = 'latest'
-        DOCKER_HUB_REPO = 'ks2363/quizlet-app' // replace with your DockerHub username/repo
+        IMAGE_NAME = 'ks2363/quizlet-app'
+        IMAGE_TAG = 'latest'
+        DOCKERHUB_CREDENTIALS = '928122f6-ce90-49ac-a982-1ee44c55c50b' // DO NOT CHANGE
     }
 
     stages {
@@ -17,36 +17,37 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image...'
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
 
-        stage('Tag Docker Image') {
+        stage('Login to Docker Hub') {
             steps {
                 script {
-                    echo 'Tagging Docker image with remote repository name...'
-                    bat "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_HUB_REPO}:${DOCKER_TAG}"
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: '928122f6-ce90-49ac-a982-1ee44c55c50b', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        echo 'Logging into Docker Hub...'
-                        bat """
-                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
-                            docker push ${DOCKER_HUB_REPO}:${DOCKER_TAG}
-                        """
+                    withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDENTIALS}", usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                     }
                 }
             }
         }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    dockerImage.push()
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker rmi ${IMAGE_NAME}:${IMAGE_TAG} || true'
+            }
+        }
     }
 }
+
 
 
 
