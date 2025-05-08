@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "ks2363/quizlet:17"
-        DOCKER_REGISTRY = "docker.io"
+        DOCKER_HUB_CREDENTIALS_ID = '928122f6-ce90-49ac-a982-1ee44c55c50b'  // Reference to the credentials ID you added
     }
 
     stages {
@@ -16,8 +15,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building Docker image: ${DOCKER_IMAGE}"
-                    bat "docker build -t ${DOCKER_IMAGE} ."
+                    echo "Building Docker image: ks2363/quizlet:17"
+                    bat 'docker build -t ks2363/quizlet:17 .'
                 }
             }
         }
@@ -26,17 +25,17 @@ pipeline {
             steps {
                 script {
                     echo "Tagging Docker image as latest"
-                    bat "docker tag ${DOCKER_IMAGE} ks2363/quizlet:latest"
+                    bat 'docker tag ks2363/quizlet:17 ks2363/quizlet:latest'
                 }
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([string(credentialsId: 'docker-hub-password', variable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
                         echo "Logging into Docker Hub"
-                        bat "echo ${DOCKER_PASSWORD} | docker login -u ks2363 --password-stdin"
+                        bat "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
                     }
                 }
             }
@@ -46,19 +45,19 @@ pipeline {
             steps {
                 script {
                     echo "Pushing Docker image to Docker Hub"
-                    bat "docker push ${DOCKER_IMAGE}"
-                    bat "docker push ks2363/quizlet:latest"
+                    bat 'docker push ks2363/quizlet:latest'
                 }
             }
         }
-    }
 
-    post {
-        always {
-            cleanWs()
+        stage('Post Actions') {
+            steps {
+                cleanWs()
+            }
         }
     }
 }
+
 
 
 
