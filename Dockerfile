@@ -1,20 +1,15 @@
-# Use Node.js 18 LTS version as base image
-FROM node:18
+# Use official Nginx image
+FROM nginx:alpine
 
-# Set working directory
-WORKDIR /app
+# Remove default Nginx page
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy your static files (like home.html, styles, JS) to Nginx web root
+COPY . /usr/share/nginx/html
 
-# Install dependencies
-RUN npm install
+# Expose port 80
+EXPOSE 80
 
-# Copy the rest of the application
-COPY . .
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
 
-# Expose the application's port (adjust as needed, e.g., 3000)
-EXPOSE 3000
-
-# Start the application
-CMD ["npm", "start"]
