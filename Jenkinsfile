@@ -2,11 +2,13 @@ pipeline {
     agent any
     environment {
         DOCKER_IMAGE = "ks2363/quizlet:latest"  // Your Docker Hub username and image name
+        GIT_BRANCH = "main"  // Ensure this matches the branch in your Git repository
     }
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/RobloxCoder-12/Quizlet.git'  // Checkout from your Git repository
+                // Check out the correct branch
+                git branch: "${GIT_BRANCH}", url: 'https://github.com/RobloxCoder-12/Quizlet.git'
             }
         }
         stage('Build Docker Image') {
@@ -41,5 +43,6 @@ pipeline {
         }
     }
 }
+
 
 
