@@ -4,7 +4,9 @@
   "description": "Quizlett is an intuitive and efficient quiz management app designed for students, teachers, and professionals. It allows users to create, manage, and take quizzes effortlessly. Key features include:",
   "main": "login.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node login.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
   },
   "keywords": [],
   "author": "",
