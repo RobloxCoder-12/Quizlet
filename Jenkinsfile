@@ -1,10 +1,13 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_IMAGE_NAME = 'quizlet-app'
+        DOCKER_IMAGE_NAME = 'quizlet'
+        DOCKER_IMAGE_TAG = 'latest'
         DOCKER_HUB_REPO = 'yourdockerhubuser/quizlet'
         KUBERNETES_DEPLOYMENT_NAME = 'quizlet-deployment'
     }
+
     stages {
         stage('Checkout SCM') {
             steps {
@@ -17,8 +20,7 @@ pipeline {
         stage('Build App') {
             steps {
                 script {
-                    // Build commands for Windows (use `bat` for Windows)
-                    bat 'echo Building the application...'
+                    echo 'Building the application...'
                     bat 'npm install'
                     bat 'npm run build'
                 }
@@ -28,8 +30,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image
-                    bat 'docker build -t ${DOCKER_IMAGE_NAME} .'
+                    echo "Building Docker image: ${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}"
+                    bat "docker build -t ${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG} ."
                 }
             }
         }
@@ -37,9 +39,10 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub and push the image
-                    bat 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
-                    bat 'docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE_NAME}'
+                    echo 'Logging into Docker Hub...'
+                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASSWORD%"
+                    echo 'Pushing Docker image to Docker Hub...'
+                    bat "docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}"
                 }
             }
         }
@@ -47,9 +50,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Deploy the Docker image to Kubernetes
-                    bat 'kubectl set image deployment/${KUBERNETES_DEPLOYMENT_NAME} ${DOCKER_IMAGE_NAME}=${DOCKER_HUB_REPO}:${DOCKER_IMAGE_NAME}'
-                    bat 'kubectl rollout status deployment/${KUBERNETES_DEPLOYMENT_NAME}'
+                    echo 'Deploying to Kubernetes...'
+                    bat "kubectl set image deployment/${KUBERNETES_DEPLOYMENT_NAME} ${DOCKER_IMAGE_NAME}=${DOCKER_HUB_REPO}:${DOCKER_IMAGE_TAG}"
+                    bat "kubectl rollout status deployment/${KUBERNETES_DEPLOYMENT_NAME}"
                 }
             }
         }
@@ -57,8 +60,9 @@ pipeline {
         stage('Test App') {
             steps {
                 script {
-                    // Test application
-                    bat 'echo Testing the application...'
+                    echo 'Running post-deployment tests...'
+                    // Add your test scripts here
+                    bat 'echo Tests completed!'
                 }
             }
         }
@@ -66,21 +70,22 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    // Cleanup operations, if any
-                    bat 'echo Cleaning up...'
+                    echo 'Cleaning up workspace...'
+                    bat 'echo Cleanup done.'
                 }
             }
         }
     }
 
     post {
+        success {
+            echo '✅ Deployment succeeded.'
+        }
+        failure {
+            echo '❌ Deployment failed.'
+        }
         always {
             echo 'Pipeline execution completed.'
         }
-
-        failure {
-            echo 'Deployment Failed.'
-        }
     }
 }
-
