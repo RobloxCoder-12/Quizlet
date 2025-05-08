@@ -15,7 +15,8 @@ pipeline {
                 script {
                     echo "Building Docker image: ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                     docker.build("${DOCKER_IMAGE}:${env.BUILD_NUMBER}")
-                    docker.tag("${DOCKER_IMAGE}:${env.BUILD_NUMBER}", "${DOCKER_IMAGE}:latest")
+                    bat 'docker tag ks2363/quizlet:14 ks2363/quizlet:latest'
+
                 }
             }
         }
