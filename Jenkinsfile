@@ -1,26 +1,35 @@
 pipeline {
     agent any
-
     environment {
-        REGISTRY = "docker.io"  // Docker registry
-        IMAGE_NAME = "your-dockerhub-username/quizlet"  // Replace with your image name
-        K8S_DEPLOYMENT_NAME = "quizlet-deployment"
-        K8S_NAMESPACE = "default"
+        DOCKER_IMAGE_NAME = 'quizlet-app'
+        DOCKER_HUB_REPO = 'yourdockerhubuser/quizlet'
+        KUBERNETES_DEPLOYMENT_NAME = 'quizlet-deployment'
     }
-
     stages {
         stage('Checkout SCM') {
             steps {
-                // Checkout code from Git repository
-                git branch: 'main', url: 'https://github.com/RobloxCoder-12/Quizlet.git'
+                script {
+                    checkout scm
+                }
             }
         }
 
         stage('Build App') {
             steps {
                 script {
+                    // Build commands for Windows (use `bat` for Windows)
+                    bat 'echo Building the application...'
+                    bat 'npm install'
+                    bat 'npm run build'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
                     // Build Docker image
-                    sh 'docker build -t ${REGISTRY}/${IMAGE_NAME}:latest .'
+                    bat 'docker build -t ${DOCKER_IMAGE_NAME} .'
                 }
             }
         }
@@ -28,13 +37,9 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                    }
-
-                    // Push Docker image to registry
-                    sh 'docker push ${REGISTRY}/${IMAGE_NAME}:latest'
+                    // Log in to Docker Hub and push the image
+                    bat 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD'
+                    bat 'docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE_NAME}'
                 }
             }
         }
@@ -42,12 +47,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Deploy the app to Kubernetes
-                    kubernetesDeploy(
-                        kubeconfigId: 'k8s-config',  // Jenkins credentials for Kubernetes cluster
-                        configs: 'k8s/deployment.yaml,k8s/service.yaml,k8s/ingress.yaml',  // Paths to your Kubernetes YAML files
-                        enableConfigSubstitution: true
-                    )
+                    // Deploy the Docker image to Kubernetes
+                    bat 'kubectl set image deployment/${KUBERNETES_DEPLOYMENT_NAME} ${DOCKER_IMAGE_NAME}=${DOCKER_HUB_REPO}:${DOCKER_IMAGE_NAME}'
+                    bat 'kubectl rollout status deployment/${KUBERNETES_DEPLOYMENT_NAME}'
                 }
             }
         }
@@ -55,8 +57,8 @@ pipeline {
         stage('Test App') {
             steps {
                 script {
-                    // You can add test commands or scripts here if needed
-                    echo 'Running tests...'
+                    // Test application
+                    bat 'echo Testing the application...'
                 }
             }
         }
@@ -64,8 +66,8 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    // Cleanup or post-deployment tasks
-                    echo 'Cleaning up after deployment...'
+                    // Cleanup operations, if any
+                    bat 'echo Cleaning up...'
                 }
             }
         }
@@ -73,15 +75,10 @@ pipeline {
 
     post {
         always {
-            // Actions that will run after every pipeline run, regardless of success or failure
             echo 'Pipeline execution completed.'
         }
-        success {
-            // Actions to take if the pipeline was successful
-            echo 'Deployment Successful!'
-        }
+
         failure {
-            // Actions to take if the pipeline failed
             echo 'Deployment Failed.'
         }
     }
