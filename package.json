@@ -1,0 +1,17 @@
+{
+  "name": "quizlet",
+  "version": "1.0.0",
+  "description": "Quizlett is an intuitive and efficient quiz management app designed for students, teachers, and professionals. It allows users to create, manage, and take quizzes effortlessly. Key features include:",
+  "main": "login.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
